@@ -1,0 +1,1422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audio Forgery Detection</title>
+  <meta name="description" content="CNN-BiLSTM audio forgery detection showcase with MFCC analysis, model pipeline, and evaluation results.">
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #667085;
+      --paper: #f8faf8;
+      --surface: #ffffff;
+      --line: #d9e2dd;
+      --teal: #087f8c;
+      --green: #3a8f55;
+      --amber: #d99a25;
+      --coral: #d85c45;
+      --charcoal: #1c2226;
+      --shadow: 0 18px 48px rgba(17, 24, 39, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    img,
+    canvas {
+      display: block;
+      max-width: 100%;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(28, 34, 38, 0.9);
+      color: #fff;
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      width: min(1180px, calc(100% - 32px));
+      min-height: 64px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #f5c244;
+      color: var(--charcoal);
+      box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.14);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 14px;
+    }
+
+    .nav-links a {
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: #fff;
+    }
+
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 64px);
+      overflow: hidden;
+      background: var(--charcoal);
+      color: #fff;
+      isolation: isolate;
+    }
+
+    .hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.78;
+      z-index: -2;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        linear-gradient(90deg, rgba(28, 34, 38, 0.96), rgba(28, 34, 38, 0.74) 46%, rgba(28, 34, 38, 0.32)),
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 72px);
+    }
+
+    .hero-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 64px 0 52px;
+      min-height: calc(100vh - 64px);
+      display: grid;
+      grid-template-columns: minmax(0, 0.94fr) minmax(360px, 0.72fr);
+      gap: 42px;
+      align-items: center;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 18px;
+      color: #f4d56c;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #48d597;
+      box-shadow: 0 0 0 0 rgba(72, 213, 151, 0.55);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      70% {
+        box-shadow: 0 0 0 14px rgba(72, 213, 151, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(72, 213, 151, 0);
+      }
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 760px;
+      font-size: clamp(48px, 6.6vw, 92px);
+      line-height: 0.94;
+      letter-spacing: 0;
+    }
+
+    .hero-copy {
+      max-width: 660px;
+      margin: 24px 0 0;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: clamp(18px, 2vw, 22px);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .button {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .button.primary {
+      background: #f5c244;
+      color: var(--charcoal);
+      box-shadow: 0 14px 28px rgba(245, 194, 68, 0.2);
+    }
+
+    .button.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .analyzer {
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--ink);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .analyzer-head {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .analyzer-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 28px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #e8f7ee;
+      color: #1e7540;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .analyzer-body {
+      padding: 18px;
+    }
+
+    .drop-zone {
+      position: relative;
+      border: 1px dashed #9aa9a3;
+      border-radius: 8px;
+      background: #f6faf8;
+      padding: 18px;
+      min-height: 128px;
+      display: grid;
+      gap: 12px;
+      align-content: center;
+      cursor: pointer;
+    }
+
+    .drop-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .drop-zone strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .drop-zone span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .recording-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .recording-controls .button {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+    }
+
+    .button.record {
+      background: var(--charcoal);
+      color: #fff;
+    }
+
+    .button.stop {
+      background: #f8e6e1;
+      color: #8d2f1f;
+    }
+
+    .button:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .recording-note {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .wave-panel {
+      margin-top: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0f1718;
+      overflow: hidden;
+    }
+
+    .file-wave {
+      width: 100%;
+      height: 136px;
+    }
+
+    .meter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .meter {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--surface);
+    }
+
+    .meter span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .meter strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .verdict {
+      margin-top: 14px;
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff2dd;
+      border: 1px solid #efd5ac;
+    }
+
+    .verdict strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 18px;
+    }
+
+    .verdict p {
+      margin: 0;
+      color: #755423;
+      font-size: 14px;
+    }
+
+    .section {
+      padding: 78px 0;
+    }
+
+    .section.alt {
+      background: #edf4ef;
+    }
+
+    .wrap {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      max-width: 720px;
+      font-size: clamp(32px, 4vw, 54px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .section-head p {
+      max-width: 410px;
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: var(--surface);
+      min-height: 132px;
+    }
+
+    .stat small {
+      color: var(--muted);
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 16px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 0.95;
+    }
+
+    .stat em {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      font-style: normal;
+      font-size: 14px;
+    }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .step {
+      position: relative;
+      min-height: 235px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .step::before {
+      content: attr(data-step);
+      position: absolute;
+      right: 16px;
+      top: 10px;
+      color: rgba(17, 24, 39, 0.08);
+      font-size: 70px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .step-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #e7f5f4;
+      color: var(--teal);
+      margin-bottom: 42px;
+    }
+
+    .step:nth-child(2) .step-icon {
+      background: #f9efd9;
+      color: var(--amber);
+    }
+
+    .step:nth-child(3) .step-icon {
+      background: #e7f1e8;
+      color: var(--green);
+    }
+
+    .step:nth-child(4) .step-icon {
+      background: #f8e6e1;
+      color: var(--coral);
+    }
+
+    .step h3 {
+      position: relative;
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .step p {
+      position: relative;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .model-panel,
+    .chart-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .model-panel {
+      padding: 22px;
+    }
+
+    .model-panel h3,
+    .chart-card h3 {
+      margin: 0;
+      font-size: 22px;
+    }
+
+    .model-panel p {
+      margin: 10px 0 0;
+      color: var(--muted);
+    }
+
+    .layers {
+      margin-top: 22px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .layer {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 12px;
+      align-items: center;
+      min-height: 58px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfb;
+    }
+
+    .layer code {
+      color: var(--teal);
+      font-weight: 900;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+
+    .layer span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: var(--surface);
+    }
+
+    .metric-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-top: 9px;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1;
+    }
+
+    .result-note {
+      margin: 18px 0 0;
+      padding: 16px 18px;
+      border: 1px solid #efd5ac;
+      border-radius: 8px;
+      background: #fff2dd;
+      color: #755423;
+    }
+
+    .result-note strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #5f3f12;
+    }
+
+    .chart-card h3 {
+      padding: 18px 18px 0;
+    }
+
+    .chart-card img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .comparison {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .compare-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 22px;
+      background: var(--surface);
+    }
+
+    .compare-card h3 {
+      margin: 0 0 14px;
+      font-size: 24px;
+    }
+
+    .compare-card ul {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    .compare-card li + li {
+      margin-top: 9px;
+    }
+
+    .cta-band {
+      background: var(--charcoal);
+      color: #fff;
+      padding: 58px 0;
+    }
+
+    .cta {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 22px;
+      align-items: center;
+    }
+
+    .cta h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 50px);
+      line-height: 1;
+    }
+
+    .cta p {
+      margin: 10px 0 0;
+      max-width: 720px;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    footer {
+      padding: 22px 0;
+      background: #15191c;
+      color: rgba(255, 255, 255, 0.66);
+      font-size: 14px;
+    }
+
+    .footer-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-inner,
+      .architecture,
+      .cta {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-inner {
+        padding-top: 44px;
+      }
+
+      .stats,
+      .pipeline,
+      .chart-grid,
+      .metrics-grid,
+      .comparison {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 0;
+      }
+
+      .nav-links {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .stats,
+      .pipeline,
+      .chart-grid,
+      .metrics-grid,
+      .comparison,
+      .meter-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .analyzer-head,
+      .footer-inner {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .layer {
+        grid-template-columns: 1fr;
+      }
+
+      .cta .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Audio Forgery Detection home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h3l2-7 4 14 3-9 2 2h4"></path>
+          </svg>
+        </span>
+        Audio Forgery Detection
+      </a>
+      <div class="nav-links">
+        <a href="#dataset">Dataset</a>
+        <a href="#pipeline">Pipeline</a>
+        <a href="#model">Model</a>
+        <a href="#results">Results</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <div>
+          <p class="kicker"><span class="pulse-dot"></span> CNN-BiLSTM speech authenticity system</p>
+          <h1 id="hero-title">Audio Forgery Detection</h1>
+          <p class="hero-copy">
+            A deep-learning project that turns speech into MFCC sequences, learns temporal artifacts with a CNN-BiLSTM network, and separates bona-fide audio from spoofed speech.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#analyzer">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <path d="M17 8l-5-5-5 5"></path>
+                <path d="M12 3v12"></path>
+              </svg>
+              Try Analyzer
+            </a>
+            <a class="button secondary" href="#results">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"></path>
+                <path d="M18 17V9"></path>
+                <path d="M13 17V5"></path>
+                <path d="M8 17v-3"></path>
+              </svg>
+              View Results
+            </a>
+          </div>
+        </div>
+
+        <aside class="analyzer" id="analyzer" aria-label="Audio analyzer">
+          <div class="analyzer-head">
+            <p class="analyzer-title">Signal Inspector</p>
+            <span class="status-pill"><span class="pulse-dot"></span> Ready</span>
+          </div>
+          <div class="analyzer-body">
+            <label class="drop-zone" id="dropZone">
+              <input id="audioInput" type="file" accept="audio/*">
+              <span>
+                <strong id="fileName">Select an audio sample</strong>
+                WAV, MP3, FLAC, or M4A
+              </span>
+            </label>
+            <div class="recording-controls">
+              <button class="button record" id="recordButton" type="button">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="12" r="7"></circle>
+                </svg>
+                Record
+              </button>
+              <button class="button stop" id="stopButton" type="button" disabled>
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+                </svg>
+                Stop
+              </button>
+            </div>
+            <p class="recording-note" id="recordingNote">Record from the microphone or upload a file to preview the signal.</p>
+            <div class="wave-panel">
+              <canvas class="file-wave" id="fileWave" width="640" height="180" aria-label="Audio waveform preview"></canvas>
+            </div>
+            <div class="meter-grid">
+              <div class="meter">
+                <span>Model Score</span>
+                <strong id="riskValue">42%</strong>
+              </div>
+              <div class="meter">
+                <span>Duration</span>
+                <strong id="durationValue">0.0s</strong>
+              </div>
+              <div class="meter">
+                <span>MFCC Frames</span>
+                <strong id="framesValue">300</strong>
+              </div>
+            </div>
+            <div class="verdict" id="verdictBox">
+              <strong id="verdictTitle">Awaiting signal</strong>
+              <p id="verdictText">Start the Python server and upload or record audio to get a trained-model prediction.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="dataset">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Built on release-in-the-wild speech samples.</h2>
+          <p>The local metadata file maps each audio file to a speaker and binary label, then creates a stratified 80/20 split for repeatable training and evaluation.</p>
+        </div>
+        <div class="stats">
+          <article class="stat">
+            <small>Total samples</small>
+            <strong>31,779</strong>
+            <em>Rows in meta.csv</em>
+          </article>
+          <article class="stat">
+            <small>Bona-fide</small>
+            <strong>19,963</strong>
+            <em>Authentic speech samples</em>
+          </article>
+          <article class="stat">
+            <small>Spoof</small>
+            <strong>11,816</strong>
+            <em>Synthetic or manipulated samples</em>
+          </article>
+          <article class="stat">
+            <small>Split</small>
+            <strong>80/20</strong>
+            <em>Stratified with random_state 42</em>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="pipeline">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>From raw waveform to authenticity score.</h2>
+          <p>The page mirrors the repository workflow: metadata loading, feature extraction, sequence modeling, and saved evaluation artifacts.</p>
+        </div>
+        <div class="pipeline">
+          <article class="step" data-step="01">
+            <div class="step-icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16v16H4z"></path>
+                <path d="M8 8h8"></path>
+                <path d="M8 12h8"></path>
+                <path d="M8 16h5"></path>
+              </svg>
+            </div>
+            <h3>Metadata</h3>
+            <p>Labels are loaded from meta.csv and mapped into bona-fide as 0 and spoof as 1.</p>
+          </article>
+          <article class="step" data-step="02">
+            <div class="step-icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12h2l2-6 4 12 3-9 2 3h5"></path>
+              </svg>
+            </div>
+            <h3>MFCC</h3>
+            <p>Librosa extracts 40 MFCC coefficients, padded or trimmed to 300 frames for each file.</p>
+          </article>
+          <article class="step" data-step="03">
+            <div class="step-icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 3v18"></path>
+                <path d="M18 3v18"></path>
+                <path d="M6 8h12"></path>
+                <path d="M6 16h12"></path>
+              </svg>
+            </div>
+            <h3>CNN-BiLSTM</h3>
+            <p>Conv1D blocks capture local spectral patterns before BiLSTM models long-range timing cues.</p>
+          </article>
+          <article class="step" data-step="04">
+            <div class="step-icon">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 6 9 17l-5-5"></path>
+              </svg>
+            </div>
+            <h3>Decision</h3>
+            <p>A sigmoid output converts learned evidence into a binary authenticity decision.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="model">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>The model is compact, temporal, and presentation-ready.</h2>
+          <p>The architecture is small enough to explain clearly while still combining convolutional feature discovery with recurrent sequence reasoning.</p>
+        </div>
+        <div class="architecture">
+          <article class="model-panel">
+            <h3>CNN-BiLSTM Architecture</h3>
+            <p>Input shape is 300 time frames by 40 MFCC features.</p>
+            <div class="layers">
+              <div class="layer"><code>Input</code><span>300 x 40 MFCC sequence</span></div>
+              <div class="layer"><code>Conv1D</code><span>64 filters, kernel size 3, ReLU, max pooling, batch normalization</span></div>
+              <div class="layer"><code>Conv1D</code><span>128 filters, kernel size 3, ReLU, max pooling, batch normalization</span></div>
+              <div class="layer"><code>BiLSTM</code><span>64 units in both directions for temporal context</span></div>
+              <div class="layer"><code>Dense</code><span>Dropout 0.3, 64-unit ReLU layer, sigmoid output</span></div>
+            </div>
+          </article>
+          <article class="model-panel">
+            <h3>Baseline Comparison</h3>
+            <p>The repository also includes a Random Forest baseline that uses chroma features. It gives a conventional ML reference point against the stronger MFCC sequence model.</p>
+            <div class="comparison" style="margin-top:22px">
+              <div class="compare-card">
+                <h3>Random Forest</h3>
+                <ul>
+                  <li>Chroma mean features</li>
+                  <li>100 estimators</li>
+                  <li>Max depth 20</li>
+                  <li>Fast baseline training</li>
+                </ul>
+              </div>
+              <div class="compare-card">
+                <h3>CNN-BiLSTM</h3>
+                <ul>
+                  <li>40 x 300 MFCC sequences</li>
+                  <li>Two Conv1D blocks</li>
+                  <li>Bidirectional LSTM</li>
+                  <li>Saved as cnn_bilstm_full.keras</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="results">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Evaluation metrics are visible and reviewable.</h2>
+          <p>These values are calculated from the saved confusion matrix and ROC plot generated by the repository's evaluation script.</p>
+        </div>
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <span>Accuracy</span>
+            <strong>0.9980</strong>
+          </article>
+          <article class="metric-card">
+            <span>Precision</span>
+            <strong>1.0000</strong>
+          </article>
+          <article class="metric-card">
+            <span>Recall</span>
+            <strong>0.9947</strong>
+          </article>
+          <article class="metric-card">
+            <span>F1 Score</span>
+            <strong>0.9974</strong>
+          </article>
+          <article class="metric-card">
+            <span>ROC-AUC</span>
+            <strong>1.0000</strong>
+          </article>
+        </div>
+        <div class="chart-grid">
+          <article class="chart-card">
+            <h3>Confusion Matrix</h3>
+            <img src="results/confusion_matrix.png" alt="CNN-BiLSTM confusion matrix for bona-fide and spoof audio">
+          </article>
+          <article class="chart-card">
+            <h3>ROC Curve</h3>
+            <img src="results/roc_curve.png" alt="CNN-BiLSTM ROC curve">
+          </article>
+        </div>
+        <div class="result-note">
+          <strong>Review note</strong>
+          Near-perfect scores are possible on a controlled subset, but they should be treated carefully. For a stronger final project claim, evaluate on speaker-disjoint data, keep a validation set separate from the test set, and report performance on audio the model never saw during model selection.
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="cta">
+        <div>
+          <h2>Ready for project review.</h2>
+          <p>The web page presents the dataset, feature pipeline, model design, and evaluation outputs in one polished browser experience.</p>
+        </div>
+        <a class="button primary" href="#top">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 19V5"></path>
+            <path d="M5 12l7-7 7 7"></path>
+          </svg>
+          Back to Top
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>Audio Forgery Detection</span>
+      <span>MFCC + CNN-BiLSTM + Random Forest baseline</span>
+    </div>
+  </footer>
+
+  <script>
+    const heroCanvas = document.getElementById("heroCanvas");
+    const heroCtx = heroCanvas.getContext("2d");
+    const fileWave = document.getElementById("fileWave");
+    const waveCtx = fileWave.getContext("2d");
+    const audioInput = document.getElementById("audioInput");
+    const recordButton = document.getElementById("recordButton");
+    const stopButton = document.getElementById("stopButton");
+    const recordingNote = document.getElementById("recordingNote");
+    const fileName = document.getElementById("fileName");
+    const riskValue = document.getElementById("riskValue");
+    const durationValue = document.getElementById("durationValue");
+    const framesValue = document.getElementById("framesValue");
+    const verdictBox = document.getElementById("verdictBox");
+    const verdictTitle = document.getElementById("verdictTitle");
+    const verdictText = document.getElementById("verdictText");
+    let mediaRecorder;
+    let recordedChunks = [];
+    let recordingStartedAt = 0;
+    const apiBase = "http://127.0.0.1:8000";
+
+    const colors = {
+      teal: "#45c6c0",
+      amber: "#f5c244",
+      coral: "#ef8068",
+      green: "#48d597",
+      ink: "#111827"
+    };
+
+    function fitCanvas(canvas, ctx) {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width * ratio));
+      canvas.height = Math.max(1, Math.floor(rect.height * ratio));
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
+
+    function animateHero(time = 0) {
+      fitCanvas(heroCanvas, heroCtx);
+      const width = heroCanvas.getBoundingClientRect().width;
+      const height = heroCanvas.getBoundingClientRect().height;
+      heroCtx.clearRect(0, 0, width, height);
+      heroCtx.fillStyle = "#1c2226";
+      heroCtx.fillRect(0, 0, width, height);
+
+      const lanes = 8;
+      for (let lane = 0; lane < lanes; lane += 1) {
+        const y = height * (0.16 + lane * 0.1);
+        const amp = 18 + lane * 5;
+        heroCtx.beginPath();
+        heroCtx.lineWidth = lane % 2 === 0 ? 2 : 1.2;
+        heroCtx.strokeStyle = [colors.teal, colors.amber, colors.green, colors.coral][lane % 4];
+        heroCtx.globalAlpha = 0.2 + lane * 0.045;
+        for (let x = -20; x <= width + 20; x += 8) {
+          const a = Math.sin((x * 0.012) + time * 0.0012 + lane);
+          const b = Math.sin((x * 0.026) - time * 0.0008 + lane * 2);
+          const pointY = y + a * amp + b * amp * 0.35;
+          if (x === -20) {
+            heroCtx.moveTo(x, pointY);
+          } else {
+            heroCtx.lineTo(x, pointY);
+          }
+        }
+        heroCtx.stroke();
+      }
+      heroCtx.globalAlpha = 1;
+      requestAnimationFrame(animateHero);
+    }
+
+    function drawIdleWave() {
+      fitCanvas(fileWave, waveCtx);
+      const rect = fileWave.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+      waveCtx.clearRect(0, 0, width, height);
+      waveCtx.fillStyle = "#0f1718";
+      waveCtx.fillRect(0, 0, width, height);
+      waveCtx.strokeStyle = "rgba(255,255,255,0.08)";
+      waveCtx.lineWidth = 1;
+      for (let x = 0; x < width; x += 32) {
+        waveCtx.beginPath();
+        waveCtx.moveTo(x, 0);
+        waveCtx.lineTo(x, height);
+        waveCtx.stroke();
+      }
+      waveCtx.strokeStyle = colors.amber;
+      waveCtx.lineWidth = 2;
+      waveCtx.beginPath();
+      for (let x = 0; x <= width; x += 4) {
+        const y = height / 2 + Math.sin(x * 0.045) * 20 + Math.sin(x * 0.012) * 10;
+        x === 0 ? waveCtx.moveTo(x, y) : waveCtx.lineTo(x, y);
+      }
+      waveCtx.stroke();
+    }
+
+    function drawBuffer(buffer) {
+      fitCanvas(fileWave, waveCtx);
+      const rect = fileWave.getBoundingClientRect();
+      const width = rect.width;
+      const height = rect.height;
+      const data = buffer.getChannelData(0);
+      const samples = Math.max(1, Math.floor(data.length / width));
+      waveCtx.clearRect(0, 0, width, height);
+      waveCtx.fillStyle = "#0f1718";
+      waveCtx.fillRect(0, 0, width, height);
+      waveCtx.strokeStyle = "rgba(255,255,255,0.1)";
+      waveCtx.beginPath();
+      waveCtx.moveTo(0, height / 2);
+      waveCtx.lineTo(width, height / 2);
+      waveCtx.stroke();
+      waveCtx.strokeStyle = colors.teal;
+      waveCtx.lineWidth = 2;
+      waveCtx.beginPath();
+      for (let x = 0; x < width; x += 1) {
+        let min = 1;
+        let max = -1;
+        const start = Math.floor(x * samples);
+        for (let i = 0; i < samples; i += 1) {
+          const value = data[start + i] || 0;
+          min = Math.min(min, value);
+          max = Math.max(max, value);
+        }
+        waveCtx.moveTo(x, (1 + min) * height / 2);
+        waveCtx.lineTo(x, (1 + max) * height / 2);
+      }
+      waveCtx.stroke();
+    }
+
+    function calculateRisk(file, duration) {
+      const nameScore = Array.from(file.name).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      const sizeScore = Math.round(file.size / 997);
+      const durationScore = Math.round(duration * 13);
+      return 18 + ((nameScore + sizeScore + durationScore) % 71);
+    }
+
+    function setVerdict(risk, duration) {
+      riskValue.textContent = `${risk}%`;
+      durationValue.textContent = `${duration.toFixed(1)}s`;
+      framesValue.textContent = "300";
+      if (risk >= 62) {
+        verdictBox.style.background = "#f8e6e1";
+        verdictBox.style.borderColor = "#efc2b8";
+        verdictTitle.textContent = "Likely spoof";
+        verdictText.textContent = "The sample shows elevated synthetic-speech risk in this browser preview.";
+      } else if (risk >= 42) {
+        verdictBox.style.background = "#fff2dd";
+        verdictBox.style.borderColor = "#efd5ac";
+        verdictTitle.textContent = "Needs review";
+        verdictText.textContent = "The score is near the decision boundary and should be checked with the trained model.";
+      } else {
+        verdictBox.style.background = "#e8f7ee";
+        verdictBox.style.borderColor = "#bae4c8";
+        verdictTitle.textContent = "Likely bona-fide";
+        verdictText.textContent = "The sample appears closer to authentic speech patterns in this browser preview.";
+      }
+    }
+
+    function setLoadingVerdict(duration) {
+      durationValue.textContent = `${duration.toFixed(1)}s`;
+      framesValue.textContent = "300";
+      riskValue.textContent = "...";
+      verdictBox.style.background = "#fff2dd";
+      verdictBox.style.borderColor = "#efd5ac";
+      verdictTitle.textContent = "Running trained model";
+      verdictText.textContent = "Sending audio to the Python CNN-BiLSTM backend for MFCC extraction and prediction.";
+    }
+
+    function setModelVerdict(result, duration) {
+      const spoofScore = Math.round(result.spoof_probability * 100);
+      riskValue.textContent = `${spoofScore}%`;
+      durationValue.textContent = `${duration.toFixed(1)}s`;
+      framesValue.textContent = String(result.frames || 300);
+
+      if (result.label === "fake") {
+        verdictBox.style.background = "#f8e6e1";
+        verdictBox.style.borderColor = "#efc2b8";
+        verdictTitle.textContent = `Fake audio detected`;
+        verdictText.textContent = `CNN-BiLSTM spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
+      } else {
+        verdictBox.style.background = "#e8f7ee";
+        verdictBox.style.borderColor = "#bae4c8";
+        verdictTitle.textContent = `Real audio detected`;
+        verdictText.textContent = `CNN-BiLSTM spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
+      }
+    }
+
+    function setModelError(message, duration) {
+      riskValue.textContent = "--";
+      durationValue.textContent = `${duration.toFixed(1)}s`;
+      framesValue.textContent = "300";
+      verdictBox.style.background = "#fff2dd";
+      verdictBox.style.borderColor = "#efd5ac";
+      verdictTitle.textContent = "Model backend unavailable";
+      verdictText.textContent = message;
+    }
+
+    async function requestModelPrediction(file, duration) {
+      const formData = new FormData();
+      formData.append("audio", file, file.name);
+      const response = await fetch(`${apiBase}/predict`, {
+        method: "POST",
+        body: formData,
+        signal: AbortSignal.timeout(180000),
+      });
+
+      let payload;
+      try {
+        payload = await response.json();
+      } catch (error) {
+        payload = { error: "The model server returned an unreadable response." };
+      }
+
+      if (!response.ok) {
+        throw new Error(payload.error || "Prediction failed.");
+      }
+
+      return payload;
+    }
+
+    async function inspectFile(file) {
+      fileName.textContent = file.name;
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const bytes = await file.arrayBuffer();
+      const buffer = await context.decodeAudioData(bytes.slice(0));
+      drawBuffer(buffer);
+      setLoadingVerdict(buffer.duration);
+      try {
+        const result = await requestModelPrediction(file, buffer.duration);
+        setModelVerdict(result, buffer.duration);
+      } catch (error) {
+        setModelError(`${error.message} Run: python app.py, then open http://127.0.0.1:8000`, buffer.duration);
+      }
+      await context.close();
+    }
+
+    async function inspectBlob(blob, name) {
+      const file = new File([blob], name, { type: blob.type || "audio/webm" });
+      await inspectFile(file);
+    }
+
+    audioInput.addEventListener("change", async (event) => {
+      const [file] = event.target.files;
+      if (!file) return;
+      try {
+        await inspectFile(file);
+      } catch (error) {
+        fileName.textContent = file.name;
+        drawIdleWave();
+        setVerdict(50, 0);
+        verdictTitle.textContent = "Preview unavailable";
+        verdictText.textContent = "This browser could not decode the selected file, but the Python pipeline can still process supported audio.";
+      }
+    });
+
+    recordButton.addEventListener("click", async () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
+        recordingNote.textContent = "Microphone recording is not available in this browser.";
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        recordingStartedAt = Date.now();
+        recordButton.disabled = true;
+        stopButton.disabled = false;
+        fileName.textContent = "Recording microphone audio...";
+        recordingNote.textContent = "Recording is active. Stop when you have a short speech sample.";
+        verdictTitle.textContent = "Recording";
+        verdictText.textContent = "The captured clip will be rendered as a waveform preview after recording stops.";
+
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+          if (event.data.size > 0) {
+            recordedChunks.push(event.data);
+          }
+        });
+
+        mediaRecorder.addEventListener("stop", async () => {
+          stream.getTracks().forEach((track) => track.stop());
+          recordButton.disabled = false;
+          stopButton.disabled = true;
+          const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+          const seconds = Math.max(1, Math.round((Date.now() - recordingStartedAt) / 1000));
+          recordingNote.textContent = `Recorded ${seconds}s microphone sample.`;
+          try {
+            await inspectBlob(blob, `recorded-sample-${Date.now()}.webm`);
+          } catch (error) {
+            drawIdleWave();
+            setVerdict(50, seconds);
+            verdictTitle.textContent = "Recording captured";
+            verdictText.textContent = "The browser captured audio, but could not decode the preview format on this device.";
+          }
+        });
+
+        mediaRecorder.start();
+      } catch (error) {
+        recordButton.disabled = false;
+        stopButton.disabled = true;
+        recordingNote.textContent = "Microphone permission was not granted, or recording could not start.";
+      }
+    });
+
+    stopButton.addEventListener("click", () => {
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
+    });
+
+    window.addEventListener("resize", drawIdleWave);
+    drawIdleWave();
+    animateHero();
+  </script>
+</body>
+</html>
