@@ -6,8 +6,8 @@ from urllib.parse import urlparse
 import cgi
 
 
-HOST = "127.0.0.1"
-PORT = 8000
+HOST = "0.0.0.0"
+PORT = int(os.environ.get("PORT", 8000))
 MODEL_PATH = "cnn_bilstm_full.keras"
 SPOOF_THRESHOLD = 0.5
 
