@@ -156,9 +156,11 @@ class AppHandler(SimpleHTTPRequestHandler):
 
 
 def main():
+    print("Preloading model...")
+    _load_model()
+    print("Model ready.")
+
     server = ThreadingHTTPServer((HOST, PORT), AppHandler)
-    print(f"Audio Forgery Detection server running at http://{HOST}:{PORT}")
-    print("Open the web page from this URL so upload and recording can call the model.")
     server.serve_forever()
 
 
