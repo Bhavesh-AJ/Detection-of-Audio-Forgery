@@ -1,7 +1,8 @@
 tensorflow-cpu==2.16.1
-librosa
-numpy
-scikit-learn
+numpy==1.26.4
+librosa==0.10.2
+soundfile==0.12.1
+scikit-learn==1.4.2
 pandas
 matplotlib
 joblib
