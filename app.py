@@ -6,8 +6,8 @@ from urllib.parse import urlparse
 import cgi
 
 
-HOST = "0.0.0.0"
-PORT = int(os.environ.get("PORT", 8000))
+HOST = "127.0.0.1"
+PORT = 8000
 MODEL_PATH = "cnn_bilstm_full.keras"
 SPOOF_THRESHOLD = 0.5
 
@@ -44,10 +44,22 @@ def _predict_audio(audio_path):
     model = _load_model()
     mfcc = extract_mfcc_for_dl(audio_path)
     features = np.expand_dims(mfcc.astype("float32"), axis=0)
-    spoof_probability = float(model.predict(features, verbose=0)[0][0])
+    prediction = model.predict(features, verbose=0)
+
+    print("\n===== DEBUG =====")
+    print("Prediction Raw:", prediction)
+    print("Shape:", prediction.shape)
+    print("=================\n")
+
+    spoof_probability = float(prediction[0][0])
+
+    print("\n===== PROBABILITY =====")
+    print("Probability:", spoof_probability)
+    print("Type:", type(spoof_probability))
+    print("=======================\n")
+
     label = "fake" if spoof_probability >= SPOOF_THRESHOLD else "real"
     confidence = spoof_probability if label == "fake" else 1.0 - spoof_probability
-
     return {
         "label": label,
         "spoof_probability": spoof_probability,
