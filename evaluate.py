@@ -37,8 +37,10 @@ df = load_metadata(DATASET_PATH)
 
 train_df, test_df = split_data(df)
 
-# Same subset used during training
-test_df = test_df.head(1000)
+print("\nDataset Split")
+print("Total Samples :", len(df))
+print("Train Samples :", len(train_df))
+print("Test Samples  :", len(test_df))
 
 # --------------------------------
 # Feature Extraction
@@ -47,7 +49,7 @@ test_df = test_df.head(1000)
 X_test = []
 y_test = []
 
-print("Extracting MFCC features...")
+print("\nExtracting MFCC features...")
 
 for _, row in test_df.iterrows():
 
@@ -94,17 +96,22 @@ model = tf.keras.models.load_model(
 # Prediction
 # --------------------------------
 
-print("Generating predictions...")
+print("\nGenerating predictions...")
 
 pred_probs = model.predict(
-    X_test
+    X_test,
+    verbose=1
 )
+
+pred_probs = pred_probs.flatten()
+
+print("\nProbability Range")
+print("Minimum:", pred_probs.min())
+print("Maximum:", pred_probs.max())
 
 preds = (
     pred_probs > 0.5
 ).astype(int)
-
-preds = preds.flatten()
 
 # --------------------------------
 # Metrics
@@ -152,6 +159,9 @@ cm = confusion_matrix(
     preds
 )
 
+print("\nConfusion Matrix")
+print(cm)
+
 disp = ConfusionMatrixDisplay(
     confusion_matrix=cm,
     display_labels=[
@@ -167,7 +177,8 @@ plt.title(
 )
 
 plt.savefig(
-    "results/confusion_matrix.png"
+    "results/confusion_matrix.png",
+    bbox_inches="tight"
 )
 
 plt.close()
@@ -210,12 +221,12 @@ plt.title(
 plt.legend()
 
 plt.savefig(
-    "results/roc_curve.png"
+    "results/roc_curve.png",
+    bbox_inches="tight"
 )
 
 plt.close()
 
 print("\nResults saved successfully.")
-
 print("results/confusion_matrix.png")
 print("results/roc_curve.png")
