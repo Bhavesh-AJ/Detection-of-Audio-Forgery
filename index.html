@@ -20,13 +20,8 @@
       --shadow: 0 18px 48px rgba(17, 24, 39, 0.14);
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
@@ -36,21 +31,9 @@
       line-height: 1.5;
     }
 
-    img,
-    canvas {
-      display: block;
-      max-width: 100%;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button,
-    input {
-      font: inherit;
-    }
+    img, canvas { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
 
     .topbar {
       position: sticky;
@@ -170,12 +153,8 @@
     }
 
     @keyframes pulse {
-      70% {
-        box-shadow: 0 0 0 14px rgba(72, 213, 151, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(72, 213, 151, 0);
-      }
+      70% { box-shadow: 0 0 0 14px rgba(72, 213, 151, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(72, 213, 151, 0); }
     }
 
     h1 {
@@ -214,9 +193,7 @@
       transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
     }
 
-    .button:hover {
-      transform: translateY(-1px);
-    }
+    .button:hover { transform: translateY(-1px); }
 
     .button.primary {
       background: #f5c244;
@@ -230,11 +207,7 @@
       border: 1px solid rgba(255, 255, 255, 0.22);
     }
 
-    .icon {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-    }
+    .icon { width: 18px; height: 18px; flex: 0 0 auto; }
 
     .analyzer {
       background: rgba(255, 255, 255, 0.94);
@@ -254,11 +227,7 @@
       border-bottom: 1px solid var(--line);
     }
 
-    .analyzer-title {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 900;
-    }
+    .analyzer-title { margin: 0; font-size: 16px; font-weight: 900; }
 
     .status-pill {
       display: inline-flex;
@@ -274,21 +243,27 @@
       white-space: nowrap;
     }
 
-    .analyzer-body {
-      padding: 18px;
-    }
+    .analyzer-body { padding: 18px; }
 
     .drop-zone {
       position: relative;
       border: 1px dashed #9aa9a3;
       border-radius: 8px;
       background: #f6faf8;
-      padding: 18px;
+      padding: 28px 18px;
       min-height: 128px;
       display: grid;
       gap: 12px;
       align-content: center;
+      justify-items: center;
+      text-align: center;
       cursor: pointer;
+      transition: border-color 180ms ease, background 180ms ease;
+    }
+
+    .drop-zone:hover {
+      border-color: var(--teal);
+      background: #eef7f6;
     }
 
     .drop-zone input {
@@ -298,50 +273,18 @@
       cursor: pointer;
     }
 
-    .drop-zone strong {
-      display: block;
-      font-size: 18px;
-    }
+    .drop-zone strong { display: block; font-size: 18px; }
+    .drop-zone span { color: var(--muted); font-size: 14px; }
 
-    .drop-zone span {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .recording-controls {
+    .upload-icon {
+      width: 40px;
+      height: 40px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    .recording-controls .button {
-      width: 100%;
-      min-height: 42px;
-      border: 1px solid var(--line);
-    }
-
-    .button.record {
-      background: var(--charcoal);
-      color: #fff;
-    }
-
-    .button.stop {
-      background: #f8e6e1;
-      color: #8d2f1f;
-    }
-
-    .button:disabled {
-      opacity: 0.52;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .recording-note {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 13px;
+      place-items: center;
+      border-radius: 50%;
+      background: #e7f5f4;
+      color: var(--teal);
+      margin: 0 auto;
     }
 
     .wave-panel {
@@ -352,10 +295,7 @@
       overflow: hidden;
     }
 
-    .file-wave {
-      width: 100%;
-      height: 136px;
-    }
+    .file-wave { width: 100%; height: 136px; }
 
     .meter-grid {
       display: grid;
@@ -378,12 +318,7 @@
       text-transform: uppercase;
     }
 
-    .meter strong {
-      display: block;
-      margin-top: 6px;
-      font-size: 24px;
-      line-height: 1.1;
-    }
+    .meter strong { display: block; margin-top: 6px; font-size: 24px; line-height: 1.1; }
 
     .verdict {
       margin-top: 14px;
@@ -393,30 +328,13 @@
       border: 1px solid #efd5ac;
     }
 
-    .verdict strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 18px;
-    }
+    .verdict strong { display: block; margin-bottom: 4px; font-size: 18px; }
+    .verdict p { margin: 0; color: #755423; font-size: 14px; }
 
-    .verdict p {
-      margin: 0;
-      color: #755423;
-      font-size: 14px;
-    }
+    .section { padding: 78px 0; }
+    .section.alt { background: #edf4ef; }
 
-    .section {
-      padding: 78px 0;
-    }
-
-    .section.alt {
-      background: #edf4ef;
-    }
-
-    .wrap {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-    }
+    .wrap { width: min(1180px, calc(100% - 32px)); margin: 0 auto; }
 
     .section-head {
       display: flex;
@@ -434,17 +352,9 @@
       letter-spacing: 0;
     }
 
-    .section-head p {
-      max-width: 410px;
-      margin: 0;
-      color: var(--muted);
-    }
+    .section-head p { max-width: 410px; margin: 0; color: var(--muted); }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 
     .stat {
       border: 1px solid var(--line);
@@ -454,32 +364,11 @@
       min-height: 132px;
     }
 
-    .stat small {
-      color: var(--muted);
-      font-weight: 800;
-      text-transform: uppercase;
-    }
+    .stat small { color: var(--muted); font-weight: 800; text-transform: uppercase; }
+    .stat strong { display: block; margin-top: 16px; font-size: clamp(30px, 4vw, 46px); line-height: 0.95; }
+    .stat em { display: block; margin-top: 10px; color: var(--muted); font-style: normal; font-size: 14px; }
 
-    .stat strong {
-      display: block;
-      margin-top: 16px;
-      font-size: clamp(30px, 4vw, 46px);
-      line-height: 0.95;
-    }
-
-    .stat em {
-      display: block;
-      margin-top: 10px;
-      color: var(--muted);
-      font-style: normal;
-      font-size: 14px;
-    }
-
-    .pipeline {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
+    .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 
     .step {
       position: relative;
@@ -513,69 +402,27 @@
       margin-bottom: 42px;
     }
 
-    .step:nth-child(2) .step-icon {
-      background: #f9efd9;
-      color: var(--amber);
-    }
+    .step:nth-child(2) .step-icon { background: #f9efd9; color: var(--amber); }
+    .step:nth-child(3) .step-icon { background: #e7f1e8; color: var(--green); }
+    .step:nth-child(4) .step-icon { background: #f8e6e1; color: var(--coral); }
 
-    .step:nth-child(3) .step-icon {
-      background: #e7f1e8;
-      color: var(--green);
-    }
+    .step h3 { position: relative; margin: 0 0 10px; font-size: 20px; }
+    .step p { position: relative; margin: 0; color: var(--muted); font-size: 15px; }
 
-    .step:nth-child(4) .step-icon {
-      background: #f8e6e1;
-      color: var(--coral);
-    }
+    .architecture { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 18px; align-items: stretch; }
 
-    .step h3 {
-      position: relative;
-      margin: 0 0 10px;
-      font-size: 20px;
-    }
-
-    .step p {
-      position: relative;
-      margin: 0;
-      color: var(--muted);
-      font-size: 15px;
-    }
-
-    .architecture {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .model-panel,
-    .chart-card {
+    .model-panel, .chart-card {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--surface);
       overflow: hidden;
     }
 
-    .model-panel {
-      padding: 22px;
-    }
+    .model-panel { padding: 22px; }
+    .model-panel h3, .chart-card h3 { margin: 0; font-size: 22px; }
+    .model-panel p { margin: 10px 0 0; color: var(--muted); }
 
-    .model-panel h3,
-    .chart-card h3 {
-      margin: 0;
-      font-size: 22px;
-    }
-
-    .model-panel p {
-      margin: 10px 0 0;
-      color: var(--muted);
-    }
-
-    .layers {
-      margin-top: 22px;
-      display: grid;
-      gap: 10px;
-    }
+    .layers { margin-top: 22px; display: grid; gap: 10px; }
 
     .layer {
       display: grid;
@@ -589,29 +436,12 @@
       background: #fbfcfb;
     }
 
-    .layer code {
-      color: var(--teal);
-      font-weight: 900;
-      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
-    }
+    .layer code { color: var(--teal); font-weight: 900; font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace; }
+    .layer span { color: var(--muted); font-size: 14px; }
 
-    .layer span {
-      color: var(--muted);
-      font-size: 14px;
-    }
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 
-    .chart-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
-      margin-bottom: 18px;
-    }
+    .metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 18px; }
 
     .metric-card {
       border: 1px solid var(--line);
@@ -620,20 +450,8 @@
       background: var(--surface);
     }
 
-    .metric-card span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .metric-card strong {
-      display: block;
-      margin-top: 9px;
-      font-size: clamp(24px, 3vw, 34px);
-      line-height: 1;
-    }
+    .metric-card span { display: block; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .metric-card strong { display: block; margin-top: 9px; font-size: clamp(24px, 3vw, 34px); line-height: 1; }
 
     .result-note {
       margin: 18px 0 0;
@@ -644,15 +462,9 @@
       color: #755423;
     }
 
-    .result-note strong {
-      display: block;
-      margin-bottom: 6px;
-      color: #5f3f12;
-    }
+    .result-note strong { display: block; margin-bottom: 6px; color: #5f3f12; }
 
-    .chart-card h3 {
-      padding: 18px 18px 0;
-    }
+    .chart-card h3 { padding: 18px 18px 0; }
 
     .chart-card img {
       width: 100%;
@@ -662,11 +474,7 @@
       background: #fff;
     }
 
-    .comparison {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
+    .comparison { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
 
     .compare-card {
       border: 1px solid var(--line);
@@ -675,26 +483,11 @@
       background: var(--surface);
     }
 
-    .compare-card h3 {
-      margin: 0 0 14px;
-      font-size: 24px;
-    }
+    .compare-card h3 { margin: 0 0 14px; font-size: 24px; }
+    .compare-card ul { margin: 0; padding-left: 18px; color: var(--muted); }
+    .compare-card li + li { margin-top: 9px; }
 
-    .compare-card ul {
-      margin: 0;
-      padding-left: 18px;
-      color: var(--muted);
-    }
-
-    .compare-card li + li {
-      margin-top: 9px;
-    }
-
-    .cta-band {
-      background: var(--charcoal);
-      color: #fff;
-      padding: 58px 0;
-    }
+    .cta-band { background: var(--charcoal); color: #fff; padding: 58px 0; }
 
     .cta {
       width: min(1180px, calc(100% - 32px));
@@ -705,24 +498,10 @@
       align-items: center;
     }
 
-    .cta h2 {
-      margin: 0;
-      font-size: clamp(30px, 4vw, 50px);
-      line-height: 1;
-    }
+    .cta h2 { margin: 0; font-size: clamp(30px, 4vw, 50px); line-height: 1; }
+    .cta p { margin: 10px 0 0; max-width: 720px; color: rgba(255, 255, 255, 0.72); }
 
-    .cta p {
-      margin: 10px 0 0;
-      max-width: 720px;
-      color: rgba(255, 255, 255, 0.72);
-    }
-
-    footer {
-      padding: 22px 0;
-      background: #15191c;
-      color: rgba(255, 255, 255, 0.66);
-      font-size: 14px;
-    }
+    footer { padding: 22px 0; background: #15191c; color: rgba(255, 255, 255, 0.66); font-size: 14px; }
 
     .footer-inner {
       width: min(1180px, calc(100% - 32px));
@@ -734,70 +513,20 @@
     }
 
     @media (max-width: 980px) {
-      .hero-inner,
-      .architecture,
-      .cta {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-inner {
-        padding-top: 44px;
-      }
-
-      .stats,
-      .pipeline,
-      .chart-grid,
-      .metrics-grid,
-      .comparison {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .section-head {
-        align-items: start;
-        flex-direction: column;
-      }
+      .hero-inner, .architecture, .cta { grid-template-columns: 1fr; }
+      .hero-inner { padding-top: 44px; }
+      .stats, .pipeline, .chart-grid, .metrics-grid, .comparison { grid-template-columns: repeat(2, 1fr); }
+      .section-head { align-items: start; flex-direction: column; }
     }
 
     @media (max-width: 680px) {
-      .nav {
-        align-items: flex-start;
-        flex-direction: column;
-        padding: 12px 0;
-      }
-
-      .nav-links {
-        width: 100%;
-        overflow-x: auto;
-        padding-bottom: 2px;
-      }
-
-      .hero-inner {
-        grid-template-columns: 1fr;
-        min-height: auto;
-      }
-
-      .stats,
-      .pipeline,
-      .chart-grid,
-      .metrics-grid,
-      .comparison,
-      .meter-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .analyzer-head,
-      .footer-inner {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .layer {
-        grid-template-columns: 1fr;
-      }
-
-      .cta .button {
-        width: 100%;
-      }
+      .nav { align-items: flex-start; flex-direction: column; padding: 12px 0; }
+      .nav-links { width: 100%; overflow-x: auto; padding-bottom: 2px; }
+      .hero-inner { grid-template-columns: 1fr; min-height: auto; }
+      .stats, .pipeline, .chart-grid, .metrics-grid, .comparison, .meter-grid { grid-template-columns: 1fr; }
+      .analyzer-head, .footer-inner { align-items: flex-start; flex-direction: column; }
+      .layer { grid-template-columns: 1fr; }
+      .cta .button { width: 100%; }
     }
   </style>
 </head>
@@ -858,31 +587,27 @@
             <span class="status-pill"><span class="pulse-dot"></span> Ready</span>
           </div>
           <div class="analyzer-body">
+
+            <!-- Upload only — record/stop buttons removed -->
             <label class="drop-zone" id="dropZone">
-              <input id="audioInput" type="file" accept="audio/*">
+              <input id="audioInput" type="file" accept=".wav">
+              <div class="upload-icon" aria-hidden="true">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <path d="M17 8l-5-5-5 5"></path>
+                  <path d="M12 3v12"></path>
+                </svg>
+              </div>
               <span>
-                <strong id="fileName">Select an audio sample</strong>
-                WAV, MP3, FLAC, or M4A
+                <strong id="fileName">Upload a WAV file</strong>
+                Click or drag &amp; drop · Supported format: WAV
               </span>
             </label>
-            <div class="recording-controls">
-              <button class="button record" id="recordButton" type="button">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <circle cx="12" cy="12" r="7"></circle>
-                </svg>
-                Record
-              </button>
-              <button class="button stop" id="stopButton" type="button" disabled>
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <rect x="7" y="7" width="10" height="10" rx="1"></rect>
-                </svg>
-                Stop
-              </button>
-            </div>
-            <p class="recording-note" id="recordingNote">Record from the microphone or upload a file to preview the signal.</p>
+
             <div class="wave-panel">
               <canvas class="file-wave" id="fileWave" width="640" height="180" aria-label="Audio waveform preview"></canvas>
             </div>
+
             <div class="meter-grid">
               <div class="meter">
                 <span>Model Score</span>
@@ -897,10 +622,12 @@
                 <strong id="framesValue">300</strong>
               </div>
             </div>
+
             <div class="verdict" id="verdictBox">
               <strong id="verdictTitle">Awaiting signal</strong>
-              <p id="verdictText">Start the Python server and upload or record audio to get a trained-model prediction.</p>
+              <p id="verdictText">Upload a WAV file to get a CNN-BiLSTM prediction.</p>
             </div>
+
           </div>
         </aside>
       </div>
@@ -1111,9 +838,6 @@
     const fileWave = document.getElementById("fileWave");
     const waveCtx = fileWave.getContext("2d");
     const audioInput = document.getElementById("audioInput");
-    const recordButton = document.getElementById("recordButton");
-    const stopButton = document.getElementById("stopButton");
-    const recordingNote = document.getElementById("recordingNote");
     const fileName = document.getElementById("fileName");
     const riskValue = document.getElementById("riskValue");
     const durationValue = document.getElementById("durationValue");
@@ -1121,9 +845,6 @@
     const verdictBox = document.getElementById("verdictBox");
     const verdictTitle = document.getElementById("verdictTitle");
     const verdictText = document.getElementById("verdictText");
-    let mediaRecorder;
-    let recordedChunks = [];
-    let recordingStartedAt = 0;
     const apiBase = window.location.origin;
 
     const colors = {
@@ -1151,7 +872,7 @@
       heroCtx.fillRect(0, 0, width, height);
 
       const lanes = 8;
-      for (let lane = 0; lane < lanes; lane += 1) {
+      for (let lane = 0; lane < lanes; lane++) {
         const y = height * (0.16 + lane * 0.1);
         const amp = 18 + lane * 5;
         heroCtx.beginPath();
@@ -1162,11 +883,7 @@
           const a = Math.sin((x * 0.012) + time * 0.0012 + lane);
           const b = Math.sin((x * 0.026) - time * 0.0008 + lane * 2);
           const pointY = y + a * amp + b * amp * 0.35;
-          if (x === -20) {
-            heroCtx.moveTo(x, pointY);
-          } else {
-            heroCtx.lineTo(x, pointY);
-          }
+          x === -20 ? heroCtx.moveTo(x, pointY) : heroCtx.lineTo(x, pointY);
         }
         heroCtx.stroke();
       }
@@ -1218,11 +935,10 @@
       waveCtx.strokeStyle = colors.teal;
       waveCtx.lineWidth = 2;
       waveCtx.beginPath();
-      for (let x = 0; x < width; x += 1) {
-        let min = 1;
-        let max = -1;
+      for (let x = 0; x < width; x++) {
+        let min = 1, max = -1;
         const start = Math.floor(x * samples);
-        for (let i = 0; i < samples; i += 1) {
+        for (let i = 0; i < samples; i++) {
           const value = data[start + i] || 0;
           min = Math.min(min, value);
           max = Math.max(max, value);
@@ -1231,35 +947,6 @@
         waveCtx.lineTo(x, (1 + max) * height / 2);
       }
       waveCtx.stroke();
-    }
-
-    function calculateRisk(file, duration) {
-      const nameScore = Array.from(file.name).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-      const sizeScore = Math.round(file.size / 997);
-      const durationScore = Math.round(duration * 13);
-      return 18 + ((nameScore + sizeScore + durationScore) % 71);
-    }
-
-    function setVerdict(risk, duration) {
-      riskValue.textContent = `${risk}%`;
-      durationValue.textContent = `${duration.toFixed(1)}s`;
-      framesValue.textContent = "300";
-      if (risk >= 62) {
-        verdictBox.style.background = "#f8e6e1";
-        verdictBox.style.borderColor = "#efc2b8";
-        verdictTitle.textContent = "Likely spoof";
-        verdictText.textContent = "The sample shows elevated synthetic-speech risk in this browser preview.";
-      } else if (risk >= 42) {
-        verdictBox.style.background = "#fff2dd";
-        verdictBox.style.borderColor = "#efd5ac";
-        verdictTitle.textContent = "Needs review";
-        verdictText.textContent = "The score is near the decision boundary and should be checked with the trained model.";
-      } else {
-        verdictBox.style.background = "#e8f7ee";
-        verdictBox.style.borderColor = "#bae4c8";
-        verdictTitle.textContent = "Likely bona-fide";
-        verdictText.textContent = "The sample appears closer to authentic speech patterns in this browser preview.";
-      }
     }
 
     function setLoadingVerdict(duration) {
@@ -1277,16 +964,15 @@
       riskValue.textContent = `${spoofScore}%`;
       durationValue.textContent = `${duration.toFixed(1)}s`;
       framesValue.textContent = String(result.frames || 300);
-
       if (result.label === "fake") {
         verdictBox.style.background = "#f8e6e1";
         verdictBox.style.borderColor = "#efc2b8";
-        verdictTitle.textContent = `Fake audio detected`;
+        verdictTitle.textContent = "Fake audio detected";
         verdictText.textContent = `CNN-BiLSTM spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
       } else {
         verdictBox.style.background = "#e8f7ee";
         verdictBox.style.borderColor = "#bae4c8";
-        verdictTitle.textContent = `Real audio detected`;
+        verdictTitle.textContent = "Real audio detected";
         verdictText.textContent = `CNN-BiLSTM spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
       }
     }
@@ -1301,27 +987,17 @@
       verdictText.textContent = message;
     }
 
-    async function requestModelPrediction(file, duration) {
+    async function requestModelPrediction(file) {
       const formData = new FormData();
       formData.append("audio", file, file.name);
-      const response = await fetch(`${apiBase}/predict`, {
-        method: "POST",
-        body: formData,
-        
-      });
-
+      const response = await fetch(`${apiBase}/predict`, { method: "POST", body: formData });
       let payload;
       try {
         payload = await response.json();
-      } catch (error) {
+      } catch {
         payload = { error: "The model server returned an unreadable response." };
       }
-
-      if (!response.ok) {
-        throw new Error(payload.error || "Prediction failed.");
-      }
-      console.log("API RESPONSE:", payload);
-
+      if (!response.ok) throw new Error(payload.error || "Prediction failed.");
       return payload;
     }
 
@@ -1333,7 +1009,7 @@
       drawBuffer(buffer);
       setLoadingVerdict(buffer.duration);
       try {
-        const result = await requestModelPrediction(file, buffer.duration);
+        const result = await requestModelPrediction(file);
         setModelVerdict(result, buffer.duration);
       } catch (error) {
         setModelError(`${error.message} Run: python app.py, then open http://127.0.0.1:8000`, buffer.duration);
@@ -1341,77 +1017,16 @@
       await context.close();
     }
 
-    async function inspectBlob(blob, name) {
-      const file = new File([blob], name, { type: blob.type || "audio/webm" });
-      await inspectFile(file);
-    }
-
     audioInput.addEventListener("change", async (event) => {
       const [file] = event.target.files;
       if (!file) return;
       try {
         await inspectFile(file);
-      } catch (error) {
+      } catch {
         fileName.textContent = file.name;
         drawIdleWave();
-        setVerdict(50, 0);
         verdictTitle.textContent = "Preview unavailable";
         verdictText.textContent = "This browser could not decode the selected file, but the Python pipeline can still process supported audio.";
-      }
-    });
-
-    recordButton.addEventListener("click", async () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) {
-        recordingNote.textContent = "Microphone recording is not available in this browser.";
-        return;
-      }
-
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        recordedChunks = [];
-        mediaRecorder = new MediaRecorder(stream);
-        recordingStartedAt = Date.now();
-        recordButton.disabled = true;
-        stopButton.disabled = false;
-        fileName.textContent = "Recording microphone audio...";
-        recordingNote.textContent = "Recording is active. Stop when you have a short speech sample.";
-        verdictTitle.textContent = "Recording";
-        verdictText.textContent = "The captured clip will be rendered as a waveform preview after recording stops.";
-
-        mediaRecorder.addEventListener("dataavailable", (event) => {
-          if (event.data.size > 0) {
-            recordedChunks.push(event.data);
-          }
-        });
-
-        mediaRecorder.addEventListener("stop", async () => {
-          stream.getTracks().forEach((track) => track.stop());
-          recordButton.disabled = false;
-          stopButton.disabled = true;
-          const blob = new Blob(recordedChunks, { type: mediaRecorder.mimeType || "audio/webm" });
-          const seconds = Math.max(1, Math.round((Date.now() - recordingStartedAt) / 1000));
-          recordingNote.textContent = `Recorded ${seconds}s microphone sample.`;
-          try {
-            await inspectBlob(blob, `recorded-sample-${Date.now()}.webm`);
-          } catch (error) {
-            drawIdleWave();
-            setVerdict(50, seconds);
-            verdictTitle.textContent = "Recording captured";
-            verdictText.textContent = "The browser captured audio, but could not decode the preview format on this device.";
-          }
-        });
-
-        mediaRecorder.start();
-      } catch (error) {
-        recordButton.disabled = false;
-        stopButton.disabled = true;
-        recordingNote.textContent = "Microphone permission was not granted, or recording could not start.";
-      }
-    });
-
-    stopButton.addEventListener("click", () => {
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
       }
     });
 
