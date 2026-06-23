@@ -5,14 +5,14 @@ def build_cnn_bilstm():
 
     model = tf.keras.Sequential()
 
-    # Input Layer
+
     model.add(
         tf.keras.layers.Input(
             shape=(300, 40)
         )
     )
 
-    # CNN Block 1
+    
     model.add(
         tf.keras.layers.Conv1D(
             filters=64,
@@ -31,7 +31,7 @@ def build_cnn_bilstm():
         tf.keras.layers.BatchNormalization()
     )
 
-    # CNN Block 2
+    
     model.add(
         tf.keras.layers.Conv1D(
             filters=128,
@@ -50,7 +50,7 @@ def build_cnn_bilstm():
         tf.keras.layers.BatchNormalization()
     )
 
-    # BiLSTM Layer
+    
     model.add(
         tf.keras.layers.Bidirectional(
             tf.keras.layers.LSTM(
@@ -60,14 +60,14 @@ def build_cnn_bilstm():
         )
     )
 
-    # Regularization
+    
     model.add(
         tf.keras.layers.Dropout(
             0.3
         )
     )
 
-    # Dense Layer
+    
     model.add(
         tf.keras.layers.Dense(
             64,
@@ -75,7 +75,7 @@ def build_cnn_bilstm():
         )
     )
 
-    # Output Layer
+    
     model.add(
         tf.keras.layers.Dense(
             1,

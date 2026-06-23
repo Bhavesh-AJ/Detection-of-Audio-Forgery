@@ -9,9 +9,11 @@ import cgi
 HOST = "0.0.0.0"
 PORT = int(os.environ.get("PORT", 8000))
 MODEL_PATH = "cnn_bilstm_full.keras"
+RF_MODEL_PATH = "random_forest.pkl"
 SPOOF_THRESHOLD = 0.5
 
 _model = None
+_rf_model = None
 
 
 def _json_response(handler, status, payload):
@@ -28,6 +30,8 @@ def _json_response(handler, status, payload):
     handler.wfile.write(body)
 
 
+# ─── CNN-BiLSTM ───────────────────────────────────────────────────────────────
+
 def _load_model():
     global _model
 
@@ -36,14 +40,14 @@ def _load_model():
 
     import tensorflow as tf
 
-    print("Loading model:", MODEL_PATH)
+    print("Loading CNN-BiLSTM model:", MODEL_PATH)
 
     _model = tf.keras.models.load_model(
         MODEL_PATH,
         compile=False
     )
 
-    print("Model loaded successfully")
+    print("CNN-BiLSTM model loaded successfully")
 
     return _model
 
@@ -107,8 +111,78 @@ def _predict_audio(audio_path):
         "threshold": SPOOF_THRESHOLD,
         "frames": int(mfcc.shape[0]),
         "features": int(mfcc.shape[1]),
+        "model": "cnn_bilstm",
     }
 
+
+# ─── Random Forest ────────────────────────────────────────────────────────────
+
+def _load_rf_model():
+    global _rf_model
+
+    if _rf_model is not None:
+        return _rf_model
+
+    import joblib
+
+    print("Loading Random Forest model:", RF_MODEL_PATH)
+
+    _rf_model = joblib.load(RF_MODEL_PATH)
+
+    print("Random Forest model loaded successfully")
+
+    return _rf_model
+
+
+def _predict_audio_rf(audio_path):
+
+    import numpy as np
+    import librosa
+
+    print("\n========== RF AUDIO ==========")
+    print("File:", audio_path)
+
+    model = _load_rf_model()
+
+    y, sr = librosa.load(audio_path, sr=None, mono=True)
+
+    # Extract chroma features (same as training baseline)
+    chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+    features = np.mean(chroma, axis=1).reshape(1, -1)
+
+    print("Feature Shape:", features.shape)
+
+    proba = model.predict_proba(features)[0]
+
+    # class order: 0 = real (bona-fide), 1 = fake (spoof)
+    spoof_probability = float(proba[1]) if len(proba) > 1 else float(proba[0])
+
+    label = (
+        "fake"
+        if spoof_probability >= SPOOF_THRESHOLD
+        else "real"
+    )
+
+    confidence = (
+        spoof_probability
+        if label == "fake"
+        else 1.0 - spoof_probability
+    )
+
+    print("RF Spoof Probability:", spoof_probability)
+
+    return {
+        "label": label,
+        "spoof_probability": spoof_probability,
+        "confidence": confidence,
+        "threshold": SPOOF_THRESHOLD,
+        "frames": len(y),
+        "features": int(features.shape[1]),
+        "model": "random_forest",
+    }
+
+
+# ─── HTTP Handler ─────────────────────────────────────────────────────────────
 
 class AppHandler(SimpleHTTPRequestHandler):
 
@@ -130,8 +204,10 @@ class AppHandler(SimpleHTTPRequestHandler):
 
             payload = {
                 "ok": True,
-                "model_path": MODEL_PATH,
-                "model_exists": os.path.exists(MODEL_PATH),
+                "cnn_bilstm_model_path": MODEL_PATH,
+                "cnn_bilstm_model_exists": os.path.exists(MODEL_PATH),
+                "rf_model_path": RF_MODEL_PATH,
+                "rf_model_exists": os.path.exists(RF_MODEL_PATH),
             }
 
             _json_response(
@@ -151,20 +227,35 @@ class AppHandler(SimpleHTTPRequestHandler):
 
         parsed = urlparse(self.path)
 
-        if parsed.path != "/predict":
+        if parsed.path == "/predict":
+            self._handle_predict(model_type="cnn_bilstm")
+        elif parsed.path == "/predict_rf":
+            self._handle_predict(model_type="random_forest")
+        else:
             _json_response(
                 self,
                 404,
                 {"error": "Unknown endpoint"}
             )
-            return
 
-        if not os.path.exists(MODEL_PATH):
+    def _handle_predict(self, model_type="cnn_bilstm"):
+
+        if model_type == "cnn_bilstm" and not os.path.exists(MODEL_PATH):
             _json_response(
                 self,
                 500,
                 {
-                    "error": f"Model file not found: {MODEL_PATH}"
+                    "error": f"CNN-BiLSTM model file not found: {MODEL_PATH}"
+                }
+            )
+            return
+
+        if model_type == "random_forest" and not os.path.exists(RF_MODEL_PATH):
+            _json_response(
+                self,
+                500,
+                {
+                    "error": f"Random Forest model file not found: {RF_MODEL_PATH}"
                 }
             )
             return
@@ -225,9 +316,10 @@ class AppHandler(SimpleHTTPRequestHandler):
 
             try:
 
-                result = _predict_audio(
-                    temp_path
-                )
+                if model_type == "random_forest":
+                    result = _predict_audio_rf(temp_path)
+                else:
+                    result = _predict_audio(temp_path)
 
             finally:
 
@@ -275,11 +367,9 @@ class AppHandler(SimpleHTTPRequestHandler):
 
 def main():
 
-    print("Preloading model...")
-
+    print("Preloading CNN-BiLSTM model...")
     _load_model()
-
-    print("Model ready.")
+    print("CNN-BiLSTM model ready.")
 
     server = ThreadingHTTPServer(
         (HOST, PORT),

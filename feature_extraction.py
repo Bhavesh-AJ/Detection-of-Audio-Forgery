@@ -51,9 +51,7 @@ def load_audio(audio_path, target_sr=16000):
         )
 
 
-# -------------------------
-# Chroma Features
-# -------------------------
+
 
 def extract_chroma(audio_path):
 
@@ -75,9 +73,7 @@ def extract_chroma(audio_path):
     return chroma_mean
 
 
-# -------------------------
-# MFCC Features
-# -------------------------
+
 
 def _hz_to_mel(hz):
 
@@ -238,9 +234,7 @@ def extract_mfcc(
     return mfcc
 
 
-# -------------------------
-# Deep Learning MFCC
-# -------------------------
+
 
 def extract_mfcc_for_dl(audio_path):
 
@@ -250,9 +244,7 @@ def extract_mfcc_for_dl(audio_path):
     return mfcc.T
 
 
-# -------------------------
-# Testing
-# -------------------------
+
 
 if __name__ == "__main__":
 

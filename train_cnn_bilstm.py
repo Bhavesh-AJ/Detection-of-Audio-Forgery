@@ -8,9 +8,7 @@ from feature_extraction import extract_mfcc_for_dl
 from cnn_bilstm_model import build_cnn_bilstm
 
 
-# ----------------------------------
-# Configuration
-# ----------------------------------
+
 
 DATASET_PATH = r"Data\release_in_the_wild"
 
@@ -18,9 +16,7 @@ BATCH_SIZE = 32
 EPOCHS = 5
 
 
-# ----------------------------------
-# Load Metadata
-# ----------------------------------
+
 
 print("Loading metadata...")
 
@@ -33,9 +29,7 @@ print("Train Samples:", len(train_df))
 print("Test Samples :", len(test_df))
 
 
-# ----------------------------------
-# Timer Callback
-# ----------------------------------
+
 
 class TimeHistory(tf.keras.callbacks.Callback):
 
@@ -61,9 +55,7 @@ class TimeHistory(tf.keras.callbacks.Callback):
         )
 
 
-# ----------------------------------
-# Audio Generator
-# ----------------------------------
+
 
 class AudioGenerator(tf.keras.utils.Sequence):
 
@@ -118,9 +110,7 @@ class AudioGenerator(tf.keras.utils.Sequence):
         return X, y
 
 
-# ----------------------------------
-# Create Generators
-# ----------------------------------
+
 
 print("\nCreating generators...")
 
@@ -145,9 +135,7 @@ print(
 )
 
 
-# ----------------------------------
-# Build Model
-# ----------------------------------
+
 
 print("\nBuilding CNN-BiLSTM model...")
 
@@ -156,9 +144,7 @@ model = build_cnn_bilstm()
 model.summary()
 
 
-# ----------------------------------
-# Training
-# ----------------------------------
+
 
 print("\nTraining Started...\n")
 
@@ -173,9 +159,7 @@ history = model.fit(
 )
 
 
-# ----------------------------------
-# Save Model
-# ----------------------------------
+
 
 print("\nSaving model...")
 

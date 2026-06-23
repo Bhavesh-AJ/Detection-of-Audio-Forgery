@@ -12,13 +12,13 @@ def load_metadata(dataset_path):
 
     df = pd.read_csv(meta_path)
 
-    # Convert labels
+    
     df["label"] = df["label"].map({
         "bona-fide": 0,
         "spoof": 1
     })
 
-    # Full audio path
+    
     df["audio_path"] = df["file"].apply(
         lambda x: os.path.join(dataset_path, x)
     )

@@ -18,18 +18,14 @@ from dataset_loader import load_metadata, split_data
 from feature_extraction import extract_mfcc_for_dl
 
 
-# --------------------------------
-# Configuration
-# --------------------------------
+
 
 DATASET_PATH = r"Data\release_in_the_wild"
 MODEL_PATH = "cnn_bilstm_full.keras"
 
 os.makedirs("results", exist_ok=True)
 
-# --------------------------------
-# Load Dataset
-# --------------------------------
+
 
 print("Loading metadata...")
 
@@ -42,9 +38,7 @@ print("Total Samples :", len(df))
 print("Train Samples :", len(train_df))
 print("Test Samples  :", len(test_df))
 
-# --------------------------------
-# Feature Extraction
-# --------------------------------
+
 
 X_test = []
 y_test = []
@@ -82,9 +76,7 @@ print("\nDataset Shapes")
 print("X_test:", X_test.shape)
 print("y_test:", y_test.shape)
 
-# --------------------------------
-# Load Saved Model
-# --------------------------------
+
 
 print("\nLoading CNN-BiLSTM model...")
 
@@ -92,9 +84,7 @@ model = tf.keras.models.load_model(
     MODEL_PATH
 )
 
-# --------------------------------
-# Prediction
-# --------------------------------
+
 
 print("\nGenerating predictions...")
 
@@ -113,9 +103,7 @@ preds = (
     pred_probs > 0.5
 ).astype(int)
 
-# --------------------------------
-# Metrics
-# --------------------------------
+
 
 accuracy = accuracy_score(
     y_test,
@@ -150,9 +138,7 @@ print(f"Recall    : {recall:.4f}")
 print(f"F1 Score  : {f1:.4f}")
 print(f"ROC-AUC   : {roc_auc:.4f}")
 
-# --------------------------------
-# Confusion Matrix
-# --------------------------------
+
 
 cm = confusion_matrix(
     y_test,
@@ -183,9 +169,7 @@ plt.savefig(
 
 plt.close()
 
-# --------------------------------
-# ROC Curve
-# --------------------------------
+
 
 fpr, tpr, _ = roc_curve(
     y_test,

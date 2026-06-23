@@ -28,9 +28,7 @@ print("\nDataset Information")
 print("Train Samples:", len(train_df))
 print("Test Samples :", len(test_df))
 
-# --------------------------------
-# Feature Extraction
-# --------------------------------
+
 
 print("\nExtracting Chroma Features...")
 
@@ -78,9 +76,7 @@ print("\nDataset Shapes")
 print("X_train:", X_train.shape)
 print("X_test :", X_test.shape)
 
-# --------------------------------
-# Train Random Forest
-# --------------------------------
+
 
 model = build_random_forest()
 
@@ -88,17 +84,13 @@ print("\nTraining Random Forest...")
 
 model.fit(X_train, y_train)
 
-# --------------------------------
-# Prediction
-# --------------------------------
+
 
 print("Generating predictions...")
 
 preds = model.predict(X_test)
 
-# --------------------------------
-# Metrics
-# --------------------------------
+
 
 accuracy = accuracy_score(
     y_test,
@@ -139,9 +131,7 @@ print(
     )
 )
 
-# --------------------------------
-# Confusion Matrix
-# --------------------------------
+
 
 cm = confusion_matrix(
     y_test,
@@ -171,9 +161,7 @@ plt.savefig(
 
 plt.close()
 
-# --------------------------------
-# Save Model
-# --------------------------------
+
 
 joblib.dump(
     model,

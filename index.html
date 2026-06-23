@@ -555,10 +555,10 @@
       <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
       <div class="hero-inner">
         <div>
-          <p class="kicker"><span class="pulse-dot"></span> CNN-BiLSTM speech authenticity system</p>
+          <p class="kicker"><span class="pulse-dot"></span> CNN-BiLSTM &amp; Random Forest speech authenticity system</p>
           <h1 id="hero-title">Audio Forgery Detection</h1>
           <p class="hero-copy">
-            A deep-learning project that turns speech into MFCC sequences, learns temporal artifacts with a CNN-BiLSTM network, and separates bona-fide audio from spoofed speech.
+            A deep-learning project that turns speech into MFCC sequences, learns temporal artifacts with a CNN-BiLSTM network, and separates bona-fide audio from spoofed speech. Also includes a Random Forest baseline using chroma features.
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#analyzer">
@@ -576,7 +576,7 @@
                 <path d="M13 17V5"></path>
                 <path d="M8 17v-3"></path>
               </svg>
-              View Results
+              See Results
             </a>
           </div>
         </div>
@@ -588,7 +588,6 @@
           </div>
           <div class="analyzer-body">
 
-            <!-- Upload only — record/stop buttons removed -->
             <label class="drop-zone" id="dropZone">
               <input id="audioInput" type="file" accept=".wav">
               <div class="upload-icon" aria-hidden="true">
@@ -604,6 +603,15 @@
               </span>
             </label>
 
+            <!-- Model selector -->
+            <div style="margin-top:12px;">
+              <label for="modelSelect" style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px;">Select Model</label>
+              <select id="modelSelect" style="width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:14px;font-weight:700;background:var(--surface);color:var(--ink);cursor:pointer;">
+                <option value="cnn_bilstm">CNN-BiLSTM (Deep Learning)</option>
+                <option value="random_forest">Random Forest (Baseline ML)</option>
+              </select>
+            </div>
+
             <div class="wave-panel">
               <canvas class="file-wave" id="fileWave" width="640" height="180" aria-label="Audio waveform preview"></canvas>
             </div>
@@ -618,14 +626,14 @@
                 <strong id="durationValue">0.0s</strong>
               </div>
               <div class="meter">
-                <span>MFCC Frames</span>
-                <strong id="framesValue">300</strong>
+                <span>Frames</span>
+                <strong id="framesValue">—</strong>
               </div>
             </div>
 
             <div class="verdict" id="verdictBox">
               <strong id="verdictTitle">Awaiting signal</strong>
-              <p id="verdictText">Upload a WAV file to get a CNN-BiLSTM prediction.</p>
+              <p id="verdictText">Upload a WAV file and select a model to get a prediction.</p>
             </div>
 
           </div>
@@ -658,7 +666,7 @@
           <article class="stat">
             <small>Split</small>
             <strong>80/20</strong>
-            <em>Stratified with random_state 42</em>
+            <em>Stratified train / test</em>
           </article>
         </div>
       </div>
@@ -667,51 +675,49 @@
     <section class="section alt" id="pipeline">
       <div class="wrap">
         <div class="section-head">
-          <h2>From raw waveform to authenticity score.</h2>
+          <h2>Four-stage detection pipeline.</h2>
           <p>The page mirrors the repository workflow: metadata loading, feature extraction, sequence modeling, and saved evaluation artifacts.</p>
         </div>
         <div class="pipeline">
-          <article class="step" data-step="01">
+          <article class="step" data-step="1">
             <div class="step-icon">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16v16H4z"></path>
-                <path d="M8 8h8"></path>
-                <path d="M8 12h8"></path>
-                <path d="M8 16h5"></path>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <path d="M14 2v6h6"></path>
               </svg>
             </div>
             <h3>Metadata</h3>
             <p>Labels are loaded from meta.csv and mapped into bona-fide as 0 and spoof as 1.</p>
           </article>
-          <article class="step" data-step="02">
+          <article class="step" data-step="2">
             <div class="step-icon">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 12h2l2-6 4 12 3-9 2 3h5"></path>
+                <path d="M3 12h3l2-7 4 14 3-9 2 2h4"></path>
               </svg>
             </div>
-            <h3>MFCC</h3>
-            <p>Librosa extracts 40 MFCC coefficients, padded or trimmed to 300 frames for each file.</p>
+            <h3>Features</h3>
+            <p>Librosa extracts 40 MFCC coefficients, padded or trimmed to 300 frames. RF baseline uses 12-dim chroma features.</p>
           </article>
-          <article class="step" data-step="03">
+          <article class="step" data-step="3">
             <div class="step-icon">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M6 3v18"></path>
-                <path d="M18 3v18"></path>
-                <path d="M6 8h12"></path>
-                <path d="M6 16h12"></path>
+                <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                <path d="M8 21h8"></path>
+                <path d="M12 17v4"></path>
               </svg>
             </div>
-            <h3>CNN-BiLSTM</h3>
-            <p>Conv1D blocks capture local spectral patterns before BiLSTM models long-range timing cues.</p>
+            <h3>Modeling</h3>
+            <p>CNN-BiLSTM learns temporal MFCC patterns. Random Forest classifies chroma feature vectors as a conventional ML baseline.</p>
           </article>
-          <article class="step" data-step="04">
+          <article class="step" data-step="4">
             <div class="step-icon">
               <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 6 9 17l-5-5"></path>
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <path d="M22 4L12 14.01l-3-3"></path>
               </svg>
             </div>
-            <h3>Decision</h3>
-            <p>A sigmoid output converts learned evidence into a binary authenticity decision.</p>
+            <h3>Evaluation</h3>
+            <p>Confusion matrix and ROC curve are generated for both models, with metrics saved as evaluation artifacts.</p>
           </article>
         </div>
       </div>
@@ -720,45 +726,58 @@
     <section class="section" id="model">
       <div class="wrap">
         <div class="section-head">
-          <h2>The model is compact, temporal, and presentation-ready.</h2>
-          <p>The architecture is small enough to explain clearly while still combining convolutional feature discovery with recurrent sequence reasoning.</p>
+          <h2>Two-model architecture.</h2>
+          <p>CNN-BiLSTM for deep temporal learning, Random Forest for interpretable baseline comparison.</p>
         </div>
         <div class="architecture">
-          <article class="model-panel">
+          <div class="model-panel">
             <h3>CNN-BiLSTM Architecture</h3>
             <p>Input shape is 300 time frames by 40 MFCC features.</p>
             <div class="layers">
-              <div class="layer"><code>Input</code><span>300 x 40 MFCC sequence</span></div>
-              <div class="layer"><code>Conv1D</code><span>64 filters, kernel size 3, ReLU, max pooling, batch normalization</span></div>
-              <div class="layer"><code>Conv1D</code><span>128 filters, kernel size 3, ReLU, max pooling, batch normalization</span></div>
-              <div class="layer"><code>BiLSTM</code><span>64 units in both directions for temporal context</span></div>
-              <div class="layer"><code>Dense</code><span>Dropout 0.3, 64-unit ReLU layer, sigmoid output</span></div>
-            </div>
-          </article>
-          <article class="model-panel">
-            <h3>Baseline Comparison</h3>
-            <p>The repository also includes a Random Forest baseline that uses chroma features. It gives a conventional ML reference point against the stronger MFCC sequence model.</p>
-            <div class="comparison" style="margin-top:22px">
-              <div class="compare-card">
-                <h3>Random Forest</h3>
-                <ul>
-                  <li>Chroma mean features</li>
-                  <li>100 estimators</li>
-                  <li>Max depth 20</li>
-                  <li>Fast baseline training</li>
-                </ul>
+              <div class="layer">
+                <code>Input</code>
+                <span>300 × 40 MFCC sequence</span>
               </div>
-              <div class="compare-card">
-                <h3>CNN-BiLSTM</h3>
-                <ul>
-                  <li>40 x 300 MFCC sequences</li>
-                  <li>Two Conv1D blocks</li>
-                  <li>Bidirectional LSTM</li>
-                  <li>Saved as cnn_bilstm_full.keras</li>
-                </ul>
+              <div class="layer">
+                <code>Conv1D</code>
+                <span>64 filters, kernel size 3, ReLU, max pooling, batch normalization</span>
+              </div>
+              <div class="layer">
+                <code>Conv1D</code>
+                <span>128 filters, kernel size 3, ReLU, max pooling, batch normalization</span>
+              </div>
+              <div class="layer">
+                <code>BiLSTM</code>
+                <span>64 units in both directions for temporal context</span>
+              </div>
+              <div class="layer">
+                <code>Dense</code>
+                <span>Dropout 0.3, 64-unit ReLU layer, sigmoid output</span>
               </div>
             </div>
-          </article>
+          </div>
+          <div class="model-panel">
+            <h3>Random Forest Architecture</h3>
+            <p>Input is a 12-dimensional mean chroma feature vector per audio file.</p>
+            <div class="layers">
+              <div class="layer">
+                <code>Input</code>
+                <span>12-dim mean chroma feature vector</span>
+              </div>
+              <div class="layer">
+                <code>Forest</code>
+                <span>100 estimators, max depth 20, random state 42</span>
+              </div>
+              <div class="layer">
+                <code>Parallel</code>
+                <span>n_jobs=−1, all CPU cores used during training</span>
+              </div>
+              <div class="layer">
+                <code>Output</code>
+                <span>predict_proba → spoof probability score [0, 1]</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -766,69 +785,66 @@
     <section class="section alt" id="results">
       <div class="wrap">
         <div class="section-head">
-          <h2>Evaluation metrics are visible and reviewable.</h2>
+          <h2>Evaluation results.</h2>
           <p>These values are calculated from the saved confusion matrix and ROC plot generated by the repository's evaluation script.</p>
         </div>
         <div class="metrics-grid">
-          <article class="metric-card">
+          <div class="metric-card">
             <span>Accuracy</span>
-            <strong>0.9980</strong>
-          </article>
-          <article class="metric-card">
+            <strong>99.83</strong>
+          </div>
+          <div class="metric-card">
             <span>Precision</span>
-            <strong>1.0000</strong>
-          </article>
-          <article class="metric-card">
+            <strong>1.00</strong>
+          </div>
+          <div class="metric-card">
             <span>Recall</span>
             <strong>0.9947</strong>
-          </article>
-          <article class="metric-card">
+          </div>
+          <div class="metric-card">
             <span>F1 Score</span>
             <strong>0.9974</strong>
-          </article>
-          <article class="metric-card">
-            <span>ROC-AUC</span>
-            <strong>1.0000</strong>
-          </article>
-        </div>
-        <div class="chart-grid">
-          <article class="chart-card">
-            <h3>Confusion Matrix</h3>
-            <img src="results/confusion_matrix.png" alt="CNN-BiLSTM confusion matrix for bona-fide and spoof audio">
-          </article>
-          <article class="chart-card">
-            <h3>ROC Curve</h3>
-            <img src="results/roc_curve.png" alt="CNN-BiLSTM ROC curve">
-          </article>
+          </div>
+          <div class="metric-card">
+            <span>AUC-ROC</span>
+            <strong>0.9999</strong>
+          </div>
         </div>
         <div class="result-note">
-          <strong>Review note</strong>
-          Near-perfect scores are possible on a controlled subset, but they should be treated carefully. For a stronger final project claim, evaluate on speaker-disjoint data, keep a validation set separate from the test set, and report performance on audio the model never saw during model selection.
+          <strong>How to read these results</strong>
+          Run the evaluation script after training to populate the confusion matrix and ROC curve images. Place them as <code>confusion_matrix.png</code> and <code>roc_curve.png</code> in the project root.
+        </div>
+        <div class="chart-grid" style="margin-top:18px;">
+          <div class="chart-card">
+            <h3>Confusion Matrix</h3>
+            <img src="results/confusion_matrix.png" alt="Confusion matrix" onerror="this.style.display='none'">
+          </div>
+          <div class="chart-card">
+            <h3>ROC Curve</h3>
+            <img src="results/roc_curve.png" alt="ROC curve" onerror="this.style.display='none'">
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="cta-band">
-      <div class="cta">
-        <div>
-          <h2>Ready for project review.</h2>
-          <p>The web page presents the dataset, feature pipeline, model design, and evaluation outputs in one polished browser experience.</p>
-        </div>
-        <a class="button primary" href="#top">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 19V5"></path>
-            <path d="M5 12l7-7 7 7"></path>
-          </svg>
-          Back to Top
-        </a>
-      </div>
-    </section>
   </main>
+
+  <div class="cta-band">
+    <div class="cta">
+      <div>
+        <h2>Run the full pipeline locally.</h2>
+        <p>Clone the repository, install dependencies, train both models, then launch the server to get live predictions from either CNN-BiLSTM or Random Forest.</p>
+      </div>
+      <a class="button primary" href="#analyzer">
+        Open Analyzer
+      </a>
+    </div>
+  </div>
 
   <footer>
     <div class="footer-inner">
-      <span>Audio Forgery Detection</span>
-      <span>MFCC + CNN-BiLSTM + Random Forest baseline</span>
+      <span>Audio Forgery Detection · CNN-BiLSTM + Random Forest</span>
+      <span>Built with Python &amp; Librosa</span>
     </div>
   </footer>
 
@@ -846,6 +862,7 @@
     const verdictTitle = document.getElementById("verdictTitle");
     const verdictText = document.getElementById("verdictText");
     const apiBase = window.location.origin;
+    const modelSelect = document.getElementById("modelSelect");
 
     const colors = {
       teal: "#45c6c0",
@@ -949,38 +966,43 @@
       waveCtx.stroke();
     }
 
+    function getModelLabel() {
+      return modelSelect.value === "random_forest" ? "Random Forest" : "CNN-BiLSTM";
+    }
+
     function setLoadingVerdict(duration) {
       durationValue.textContent = `${duration.toFixed(1)}s`;
-      framesValue.textContent = "300";
+      framesValue.textContent = "—";
       riskValue.textContent = "...";
       verdictBox.style.background = "#fff2dd";
       verdictBox.style.borderColor = "#efd5ac";
       verdictTitle.textContent = "Running trained model";
-      verdictText.textContent = "Sending audio to the Python CNN-BiLSTM backend for MFCC extraction and prediction.";
+      verdictText.textContent = `Sending audio to the Python ${getModelLabel()} backend for feature extraction and prediction.`;
     }
 
     function setModelVerdict(result, duration) {
       const spoofScore = Math.round(result.spoof_probability * 100);
+      const modelUsed = result.model === "random_forest" ? "Random Forest" : "CNN-BiLSTM";
       riskValue.textContent = `${spoofScore}%`;
       durationValue.textContent = `${duration.toFixed(1)}s`;
-      framesValue.textContent = String(result.frames || 300);
+      framesValue.textContent = String(result.frames || "—");
       if (result.label === "fake") {
         verdictBox.style.background = "#f8e6e1";
         verdictBox.style.borderColor = "#efc2b8";
         verdictTitle.textContent = "Fake audio detected";
-        verdictText.textContent = `CNN-BiLSTM spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
+        verdictText.textContent = `${modelUsed} spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
       } else {
         verdictBox.style.background = "#e8f7ee";
         verdictBox.style.borderColor = "#bae4c8";
         verdictTitle.textContent = "Real audio detected";
-        verdictText.textContent = `CNN-BiLSTM spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
+        verdictText.textContent = `${modelUsed} spoof probability: ${spoofScore}%. Confidence: ${Math.round(result.confidence * 100)}%.`;
       }
     }
 
     function setModelError(message, duration) {
       riskValue.textContent = "--";
       durationValue.textContent = `${duration.toFixed(1)}s`;
-      framesValue.textContent = "300";
+      framesValue.textContent = "—";
       verdictBox.style.background = "#fff2dd";
       verdictBox.style.borderColor = "#efd5ac";
       verdictTitle.textContent = "Model backend unavailable";
@@ -990,7 +1012,8 @@
     async function requestModelPrediction(file) {
       const formData = new FormData();
       formData.append("audio", file, file.name);
-      const response = await fetch(`${apiBase}/predict`, { method: "POST", body: formData });
+      const endpoint = modelSelect.value === "random_forest" ? "/predict_rf" : "/predict";
+      const response = await fetch(`${apiBase}${endpoint}`, { method: "POST", body: formData });
       let payload;
       try {
         payload = await response.json();
